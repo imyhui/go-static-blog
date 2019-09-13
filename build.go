@@ -3,8 +3,11 @@ package main
 import (
 	"fmt"
 	"io/ioutil"
+	"log"
+	"net/http"
 	"os"
 	"path/filepath"
+	"regexp"
 	"sort"
 	"strings"
 	"text/template"
@@ -84,7 +87,25 @@ func writeIndex(posts []Post) {
 	t.Execute(file, posts)
 }
 
+func handler(w http.ResponseWriter, r *http.Request) {
+	var validPath = regexp.MustCompile("^/([a-z0-9-]+)$")
+	postURL := validPath.FindStringSubmatch(r.URL.Path)
+	filePath := "public/index.html"
+
+	if postURL != nil {
+		filePath = fmt.Sprintf("public/%s.html", postURL[1])
+	}
+	log.Println(filePath)
+	t, _ := template.ParseFiles(filePath)
+	err := t.Execute(w, nil)
+	if err != nil {
+		fmt.Printf("error %s", err)
+	}
+}
+
 func main() {
 	posts := writePosts()
 	writeIndex(posts)
+	http.HandleFunc("/", handler)
+	log.Fatal(http.ListenAndServe(":8080", nil))
 }
