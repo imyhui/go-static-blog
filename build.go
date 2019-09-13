@@ -3,8 +3,10 @@ package main
 import (
 	"fmt"
 	"io/ioutil"
+	"os"
 	"path/filepath"
 	"strings"
+	"text/template"
 
 	"github.com/russross/blackfriday"
 )
@@ -38,10 +40,23 @@ func parseSource(fileName string) Post {
 	return Post{title, date, content, source, URL}
 }
 
+func writePost(post Post) {
+	t, err := template.ParseFiles("templates/post.html")
+	if err != nil {
+		fmt.Printf("error %s", err)
+	}
+	fileName := fmt.Sprintf("public/%s.html", post.URL)
+	file, err := os.OpenFile(fileName, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0755)
+	if err != nil {
+		fmt.Printf("error %s", err)
+	}
+	t.Execute(file, post)
+}
+
 func main() {
 	files := getSources()
 	for _, file := range files {
 		post := parseSource(file)
-		fmt.Printf("%v\n", post)
+		writePost(post)
 	}
 }
