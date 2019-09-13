@@ -1,0 +1,15 @@
+<!doctype html>
+<html>
+
+<body>
+    <h1>My blog posts</h1>
+    <ol>
+        {{range .}}
+        <li>
+            <a href="/{{.URL}}">{{.Title}}</a>
+        </li>
+        {{end}}
+    </ol>
+</body>
+
+</html>

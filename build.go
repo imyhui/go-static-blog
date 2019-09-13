@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"sort"
 	"strings"
 	"text/template"
 
@@ -18,6 +19,12 @@ type Post struct {
 	Source  []byte
 	URL     string
 }
+
+type ByDate []Post
+
+func (a ByDate) Len() int           { return len(a) }
+func (a ByDate) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
+func (a ByDate) Less(i, j int) bool { return a[i].Date > a[j].Date }
 
 func getSources() []string {
 	files, _ := filepath.Glob("srcs/*.md")
@@ -64,7 +71,20 @@ func writePosts() []Post {
 	return posts
 }
 
+func writeIndex(posts []Post) {
+	sort.Sort(ByDate(posts))
+	t, err := template.ParseFiles("templates/index.html")
+	if err != nil {
+		fmt.Printf("error %s", err)
+	}
+	file, err := os.OpenFile("public/index.html", os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0755)
+	if err != nil {
+		fmt.Printf("error %s", err)
+	}
+	t.Execute(file, posts)
+}
+
 func main() {
 	posts := writePosts()
-	fmt.Println(posts)
+	writeIndex(posts)
 }
