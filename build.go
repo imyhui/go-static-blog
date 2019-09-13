@@ -53,10 +53,18 @@ func writePost(post Post) {
 	t.Execute(file, post)
 }
 
-func main() {
+func writePosts() []Post {
+	posts := []Post{}
 	files := getSources()
 	for _, file := range files {
 		post := parseSource(file)
 		writePost(post)
+		posts = append(posts, post)
 	}
+	return posts
+}
+
+func main() {
+	posts := writePosts()
+	fmt.Println(posts)
 }
