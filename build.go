@@ -1,7 +1,16 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"path/filepath"
+)
+
+func getSources() []string {
+	files, _ := filepath.Glob("srcs/*.md")
+	return files
+}
 
 func main() {
-	fmt.Printf("Hello World")
+	files := getSources()
+	fmt.Printf("%v", files)
 }
