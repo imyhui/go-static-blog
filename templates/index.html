@@ -6,7 +6,7 @@
     <ol>
         {{range .}}
         <li>
-            <a href="/{{.URL}}">{{.Title}}</a>
+            <a href="/{{.Meta.Slug}}">{{.Meta.Title}}</a>
         </li>
         {{end}}
     </ol>

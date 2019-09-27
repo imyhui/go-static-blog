@@ -13,21 +13,30 @@ import (
 	"text/template"
 
 	"github.com/russross/blackfriday"
+	"gopkg.in/yaml.v2"
 )
 
+// Post Data
 type Post struct {
-	Title   string
-	Date    string
 	Content string
-	Source  []byte
-	URL     string
+	Meta    *Meta
 }
 
+// Meta Data
+type Meta struct {
+	Title string
+	Tags  []string
+	Date  string
+	Slug  string `yaml:"permalink"`
+	Draft bool
+}
+
+// ByDate use for post sort
 type ByDate []Post
 
 func (a ByDate) Len() int           { return len(a) }
 func (a ByDate) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
-func (a ByDate) Less(i, j int) bool { return a[i].Date > a[j].Date }
+func (a ByDate) Less(i, j int) bool { return a[i].Meta.Date > a[j].Meta.Date }
 
 func getSources() []string {
 	files, _ := filepath.Glob("srcs/*.md")
@@ -40,14 +49,32 @@ func renderMarkdown(source []byte) string {
 }
 
 func parseSource(fileName string) Post {
+	post := Post{}
 	sources, _ := ioutil.ReadFile(fileName)
 	lines := strings.Split(string(sources), "\n")
-	title := strings.Split(string(lines[1]), ": ")[1]
-	date := strings.Split(string(lines[2]), ": ")[1]
-	source := []byte(strings.Join(lines[5:len(lines)], "\n"))
-	content := renderMarkdown(source)
-	URL := strings.Replace(strings.ToLower(title), " ", "-", -1)
-	return Post{title, date, content, source, URL}
+	metaLoc := [2]int{}
+	SEP := "---"
+	if lines[0] == SEP {
+		metaLoc[0] = 1
+	}
+	for k, v := range lines[1:] {
+		if v == SEP {
+			if metaLoc[1] != 0 {
+				break
+			}
+			metaLoc[1] = k + 1
+		}
+	}
+	meta := lines[metaLoc[0]:metaLoc[1]]
+	metaSource := []byte(strings.Join(meta, "\n"))
+	source := []byte(strings.Join(lines[metaLoc[1]:len(lines)], "\n"))
+
+	err := yaml.Unmarshal(metaSource, &post.Meta)
+	if err != nil {
+		fmt.Printf("error %s", err)
+	}
+	post.Content = renderMarkdown(source)
+	return post
 }
 
 func writePost(post Post) {
@@ -55,7 +82,7 @@ func writePost(post Post) {
 	if err != nil {
 		fmt.Printf("error %s", err)
 	}
-	fileName := fmt.Sprintf("public/%s.html", post.URL)
+	fileName := fmt.Sprintf("public/%s.html", post.Meta.Slug)
 	file, err := os.OpenFile(fileName, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0755)
 	if err != nil {
 		fmt.Printf("error %s", err)

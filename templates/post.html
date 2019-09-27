@@ -2,12 +2,13 @@
 <html>
 
 <head>
-    <title>{{.Title}}</title>
+    <title>{{.Meta.Title}}</title>
 </head>
 
 <body>
-    <h1>{{.Title}}</h1>
-    <em>Posted on {{.Date}}</em>
+    <h1>{{.Meta.Title}}</h1>
+    <em>Posted on {{.Meta.Date}}</em>
+    <em>Tags: {{.Meta.Tags}}</em>
     <article>
         {{.Content}}
     </article>
