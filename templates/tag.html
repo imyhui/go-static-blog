@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>{{.Name}}</title>
+</head>
+
+<body>
+    <h1>{{.Name}}</h1>
+    <dl class="posts-list">
+        {{range $tag, $post := .Posts}}
+        <a href="/{{$post.Meta.Slug}}">{{$post.Meta.Title}}</a>
+        {{end}}
+    </dl>
+</body>
+</html>

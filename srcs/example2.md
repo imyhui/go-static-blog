@@ -1,7 +1,10 @@
 ---
 title: My Second Post
 date: 2019-09-11
-permalink: test
+tags:
+- 记录
+- test
+permalink: just-test
 ---
 
 # Some Title

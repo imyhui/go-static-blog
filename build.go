@@ -31,6 +31,12 @@ type Meta struct {
 	Draft bool
 }
 
+// Tag Page Data
+type Tag struct {
+	Name  string
+	Posts []Post
+}
+
 // ByDate use for post sort
 type ByDate []Post
 
@@ -77,6 +83,14 @@ func parseSource(fileName string) Post {
 	return post
 }
 
+func createPath(path string) error {
+	_, err := os.Stat(path)
+	if err != nil && os.IsNotExist(err) {
+		return os.Mkdir(path, os.ModePerm)
+	}
+	return nil
+}
+
 func writePost(post Post) {
 	t, err := template.ParseFiles("templates/post.html")
 	if err != nil {
@@ -101,6 +115,49 @@ func writePosts() []Post {
 	return posts
 }
 
+func writeTagPage(tags map[string][]Post) {
+	err := createPath("public/tag")
+	if err != nil {
+		fmt.Printf("error %s", err)
+	}
+	t, err := template.ParseFiles("templates/tag.html")
+	for tag, post := range tags {
+		if err != nil {
+			fmt.Printf("error %s", err)
+		}
+		fileName := fmt.Sprintf("public/tag/%s.html", tag)
+		file, err := os.OpenFile(fileName, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0755)
+		if err != nil {
+			fmt.Printf("error %s", err)
+		}
+		t.Execute(file, Tag{tag, post})
+	}
+}
+
+func writeTagsIndex(tags map[string][]Post) {
+	t, err := template.ParseFiles("templates/tags.html")
+	if err != nil {
+		fmt.Printf("error %s", err)
+	}
+	file, err := os.OpenFile("public/tags.html", os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0755)
+	if err != nil {
+		fmt.Printf("error %s", err)
+	}
+	t.Execute(file, tags)
+}
+
+func writeTags(posts []Post) {
+
+	tags := make(map[string][]Post, 0)
+	for _, post := range posts {
+		for _, tag := range post.Meta.Tags {
+			tags[tag] = append(tags[tag], post)
+		}
+	}
+	writeTagPage(tags)
+	writeTagsIndex(tags)
+}
+
 func writeIndex(posts []Post) {
 	sort.Sort(ByDate(posts))
 	t, err := template.ParseFiles("templates/index.html")
@@ -115,7 +172,7 @@ func writeIndex(posts []Post) {
 }
 
 func handler(w http.ResponseWriter, r *http.Request) {
-	var validPath = regexp.MustCompile("^/([a-z0-9-]+)$")
+	var validPath = regexp.MustCompile("^/((tag/)?[\u4e00-\u9fa5a-z0-9-]+)$")
 	postURL := validPath.FindStringSubmatch(r.URL.Path)
 	filePath := "public/index.html"
 
@@ -133,6 +190,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 func main() {
 	posts := writePosts()
 	writeIndex(posts)
+	writeTags(posts)
 	http.HandleFunc("/", handler)
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }

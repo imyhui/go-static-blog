@@ -1,0 +1,15 @@
+<!doctype html>
+<html>
+
+<body>
+    <h1>Tags</h1>
+    <ol>
+        {{range $tag, $post := .}}
+        <li>
+            <a href="/tag/{{$tag}}">{{$tag}}</a>
+        </li>
+        {{end}}
+    </ol>
+</body>
+
+</html>
