@@ -8,10 +8,14 @@
 <body>
     <h1>{{.Meta.Title}}</h1>
     <em>Posted on {{.Meta.Date}}</em>
-    <em>Tags: {{.Meta.Tags}}</em>
     <article>
         {{.Content}}
     </article>
+    <span class="tags">
+        {{range $k, $tag := .Meta.Tags}}
+            <a href="/tag/{{$tag}}">{{$tag}}</a>
+        {{end}}
+    </span>
 </body>
 
 </html>
