@@ -167,7 +167,7 @@ func writeTags(posts []Post) {
 
 func writeIndex(posts []Post) {
 	sort.Sort(ByDate(posts))
-	t, err := template.ParseFiles("templates/index.html")
+	t, err := template.ParseFiles("templates/index.html", "templates/partials/_header.html")
 	if err != nil {
 		fmt.Printf("error %s", err)
 	}
