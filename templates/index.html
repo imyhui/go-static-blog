@@ -1,15 +1,47 @@
 <!doctype html>
 <html>
+    <header class="center">
+        <div class="blog-title"><a href="/">My blog posts</a></div>
+        <div class="blog-description">Thoughts, stories and ideas.</div>
+        <div class="top-nav">
+                <ul id="navigation">
+                    <li class="nav" role="presentation"><a href="/">Home</a></li>
+                    <li class="nav" role="presentation"><a href="/tags">Tags</a></li>
+                    <!-- <li class="nav" role="presentation"><a href="/archives">Archives</a></li> -->
+                    <!-- <li class="nav" role="presentation"><a href="/about">About</a></li> -->
+                    <li class="nav" role="presentation"><a href="https://github.com/imyhui">Github</a></li>
+                </ul>
+        </div>
+    </header>
 
-<body>
-    <h1>My blog posts</h1>
-    <ol>
-        {{range .}}
-        <li>
-            <a href="/{{.Meta.Slug}}">{{.Meta.Title}}</a>
-        </li>
-        {{end}}
-    </ol>
-</body>
+    <main role="main">
 
+        <div id="archives-list" class="index-search-list typo"></div>
+
+        <div id="articles">
+                {{range $tkey, $post := .}}
+                <article class="index-post">
+                        <header class="post-toptitle">
+                            <h2><a href="/{{$post.Meta.Slug}}">{{$post.Meta.Title}}</a></h2>
+                        </header>
+                        <section class="post-excerpt">
+                            <p>{{$post.Excerpt}} ...</p>
+                        </section>
+                        <section class="post-meta">
+                            <time datetime=" {{$post.Meta.Date}} ">{{$post.Meta.Date}}</time>
+                            <span class="tags">
+                                {{range $k, $t := $post.Meta.Tags}}
+                                <a href="/tag/{{$t}}">{{$t}}</a>
+                                {{end}}
+                            </span>
+                        </section>
+                </article>
+                {{end}}  
+        </div>
+    </main>
+    <footer class="blog-footer">
+            <p class="line-1">Powered by <a href="https://golang.google.cn" target="_blank">Go</a> | Theme <a href="https://github.com/ddiu8081/ghost-theme-Moegi" target="_blank">Moegi</a></p>
+            <p class="line-2">&copy;<a href="/">My blog posts</a></p>
+            <p id="footer-text" class="line-2"></p>
+    </footer>
 </html>

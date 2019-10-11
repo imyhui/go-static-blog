@@ -1,28 +1,36 @@
 <!DOCTYPE html>
 <html>
-
-<head>
-    <title>My Second Post</title>
-</head>
-
-<body>
-    <h1>My Second Post</h1>
-    <em>Posted on 2019-09-11</em>
-    <article>
-        <hr />
-
-<h1>Some Title</h1>
+    <header>
+        <div class="post-blog-title">
+            <a href="/"><i class="iconfont icon-back"></i>&nbsp;My blog posts</a>
+        </div>
+    </header>
+    
+    <main role="main">
+        <article class="single-post">
+            <header class="post-header">
+                <h1 class="post-title">My Second Post</h1>
+                <section class="post-meta">
+                    <time class="post-date" datetime="2019-09-11">2019-09-11</time>
+                </section>
+            </header>
+    
+            <section class="post-content typo">
+                    <h1>Some Title</h1>
 
 <p>Markdown content here.</p>
+            
+            </section>
 
-    </article>
-    <span class="tags">
-        
-            <a href="/tag/记录">记录</a>
-        
-            <a href="/tag/test">test</a>
-        
-    </span>
-</body>
-
+        </article>
+        <footer class="post-footer">
+                <span class="tags">
+                        
+                            <a href="/tag/记录">记录</a>
+                        
+                            <a href="/tag/test">test</a>
+                        
+                </span>
+        </footer>
+    </main>
 </html>

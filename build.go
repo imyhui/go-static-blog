@@ -19,6 +19,7 @@ import (
 // Post Data
 type Post struct {
 	Content string
+	Excerpt string
 	Meta    *Meta
 }
 
@@ -73,11 +74,17 @@ func parseSource(fileName string) Post {
 	}
 	meta := lines[metaLoc[0]:metaLoc[1]]
 	metaSource := []byte(strings.Join(meta, "\n"))
-	source := []byte(strings.Join(lines[metaLoc[1]:len(lines)], "\n"))
+	content := strings.Join(lines[metaLoc[1]+1:len(lines)], "\n")
+	source := []byte(content)
 
 	err := yaml.Unmarshal(metaSource, &post.Meta)
 	if err != nil {
 		fmt.Printf("error %s", err)
+	}
+	if len(post.Excerpt) > 100 {
+		post.Excerpt = content[:100]
+	} else {
+		post.Excerpt = content
 	}
 	post.Content = renderMarkdown(source)
 	return post

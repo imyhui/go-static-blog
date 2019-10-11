@@ -1,21 +1,31 @@
 <!DOCTYPE html>
 <html>
+    <header>
+        <div class="post-blog-title">
+            <a href="/"><i class="iconfont icon-back"></i>&nbsp;My blog posts</a>
+        </div>
+    </header>
+    
+    <main role="main">
+        <article class="single-post">
+            <header class="post-header">
+                <h1 class="post-title">{{.Meta.Title}}</h1>
+                <section class="post-meta">
+                    <time class="post-date" datetime="{{.Meta.Date}}">{{.Meta.Date}}</time>
+                </section>
+            </header>
+    
+            <section class="post-content typo">
+                    {{.Content}}            
+            </section>
 
-<head>
-    <title>{{.Meta.Title}}</title>
-</head>
-
-<body>
-    <h1>{{.Meta.Title}}</h1>
-    <em>Posted on {{.Meta.Date}}</em>
-    <article>
-        {{.Content}}
-    </article>
-    <span class="tags">
-        {{range $k, $tag := .Meta.Tags}}
-            <a href="/tag/{{$tag}}">{{$tag}}</a>
-        {{end}}
-    </span>
-</body>
-
+        </article>
+        <footer class="post-footer">
+                <span class="tags">
+                        {{range $k, $tag := .Meta.Tags}}
+                            <a href="/tag/{{$tag}}">{{$tag}}</a>
+                        {{end}}
+                </span>
+        </footer>
+    </main>
 </html>

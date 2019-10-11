@@ -1,15 +1,28 @@
-<!doctype html>
+<!DOCTYPE html>
 <html>
+    <header>
+        <div class="post-blog-title">
+            <a href="/"><i class="iconfont icon-back"></i>&nbsp;My blog posts</a>
+        </div>
+    </header>
 
-<body>
-    <h1>Tags</h1>
-    <ol>
-        {{range $tag, $post := .}}
-        <li>
-            <a href="/tag/{{$tag}}">{{$tag}}</a>
-        </li>
-        {{end}}
-    </ol>
-</body>
+    <main role="main">
+        <article class="page-archives">
+            <header class="post-header short-diver">
+                <h1 class="post-title">标签</h1>
+                <section class="post-meta">
+                    共有{{len .}}个标签
+                </section>
+            </header>
 
+            <div class="left">
+                    <div class="tag-cloud tags">
+                            {{range $tag, $post := .}}
+                            <a href="/tag/{{$tag}}" class="tag-item">#{{$tag}} ({{len $post}})</a>
+                            {{end}}
+                    </div>
+            </div>
+
+        </article>
+    </main>
 </html>
