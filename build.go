@@ -99,7 +99,7 @@ func createPath(path string) error {
 }
 
 func writePost(post Post) {
-	t, err := template.ParseFiles("templates/post.html")
+	t, err := template.ParseFiles("templates/post.html", "templates/partials/_header.html", "templates/partials/_footer.html")
 	if err != nil {
 		fmt.Printf("error %s", err)
 	}
@@ -127,7 +127,7 @@ func writeTagPage(tags map[string][]Post) {
 	if err != nil {
 		fmt.Printf("error %s", err)
 	}
-	t, err := template.ParseFiles("templates/tag.html")
+	t, err := template.ParseFiles("templates/tag.html", "templates/partials/_header.html", "templates/partials/_footer.html")
 	for tag, post := range tags {
 		if err != nil {
 			fmt.Printf("error %s", err)
@@ -142,7 +142,7 @@ func writeTagPage(tags map[string][]Post) {
 }
 
 func writeTagsIndex(tags map[string][]Post) {
-	t, err := template.ParseFiles("templates/tags.html")
+	t, err := template.ParseFiles("templates/tags.html", "templates/partials/_header.html", "templates/partials/_footer.html")
 	if err != nil {
 		fmt.Printf("error %s", err)
 	}
@@ -167,7 +167,7 @@ func writeTags(posts []Post) {
 
 func writeIndex(posts []Post) {
 	sort.Sort(ByDate(posts))
-	t, err := template.ParseFiles("templates/index.html", "templates/partials/_header.html")
+	t, err := template.ParseFiles("templates/index.html", "templates/partials/_header.html", "templates/partials/_footer.html")
 	if err != nil {
 		fmt.Printf("error %s", err)
 	}

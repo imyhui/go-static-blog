@@ -1,36 +1,40 @@
 <!DOCTYPE html>
 <html>
-    <header>
-        <div class="post-blog-title">
-            <a href="../index.html"><i class="iconfont icon-back"></i>&nbsp;My blog posts</a>
-        </div>
-    </header>
-    
-    <main role="main">
-        <header class="post-header">
-            <h1 class="post-title">#{{.Name}}</h1>
-            <section class="post-meta">
-                    标签下共有{{len .Posts}}篇文章
-            </section>
-        </header>
-        {{range $tag, $post := .Posts}}
-        <article class="index-post">
-                <header class="post-toptitle">
-                    <h2><a href="../{{$post.Meta.Slug}}.html">{{$post.Meta.Title}}</a></h2>
+    {{template "_header.html" .}}
+    <body>        
+        <div class="container">
+            <header>
+                    <div class="post-blog-title">
+                        <a href="../index.html"><i class="iconfont icon-back"></i>&nbsp;My blog posts</a>
+                    </div>
+            </header>
+            <main role="main">
+                <header class="post-header">
+                    <h1 class="post-title">#{{.Name}}</h1>
+                    <section class="post-meta">
+                            标签下共有{{len .Posts}}篇文章
+                    </section>
                 </header>
-                <section class="post-excerpt">
-                    <p>{{$post.Excerpt}} ...</p>
-                </section>
-                <section class="post-meta">
-                    <time datetime=" {{$post.Meta.Date}} ">{{$post.Meta.Date}}</time>
-                    <span class="tags">
-                        {{range $k, $t := $post.Meta.Tags}}
-                        <a href="./{{$t}}.html">{{$t}}</a>
-                        {{end}}
-                    </span>
-                </section>
-        </article>
-        {{end}}  
-    </main>
-
+                {{range $tag, $post := .Posts}}
+                <article class="index-post">
+                        <header class="post-toptitle">
+                            <h2><a href="../{{$post.Meta.Slug}}.html">{{$post.Meta.Title}}</a></h2>
+                        </header>
+                        <section class="post-excerpt">
+                            <p>{{$post.Excerpt}} ...</p>
+                        </section>
+                        <section class="post-meta">
+                            <time datetime=" {{$post.Meta.Date}} ">{{$post.Meta.Date}}</time>
+                            <span class="tags">
+                                {{range $k, $t := $post.Meta.Tags}}
+                                <a href="./{{$t}}.html">{{$t}}</a>
+                                {{end}}
+                            </span>
+                        </section>
+                </article>
+                {{end}}  
+            </main>
+        </div>
+    {{template "_footer.html" .}}
+    </body>
 </html>

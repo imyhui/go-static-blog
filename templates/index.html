@@ -16,47 +16,32 @@
     </header>
     <body>
             <div class="container">
-                    <main role="main">
-
-                            <div id="archives-list" class="index-search-list typo"></div>
-                    
-                            <div id="articles">
-                                    {{range $tkey, $post := .}}
-                                    <article class="index-post">
-                                            <header class="post-toptitle">
-                                                <h2><a href="./{{$post.Meta.Slug}}.html">{{$post.Meta.Title}}</a></h2>
-                                            </header>
-                                            <section class="post-excerpt">
-                                                <p>{{$post.Excerpt}} ...</p>
-                                            </section>
-                                            <section class="post-meta">
-                                                <time datetime=" {{$post.Meta.Date}} ">{{$post.Meta.Date}}</time>
-                                                <span class="tags">
-                                                    {{range $k, $t := $post.Meta.Tags}}
-                                                    <a href="./tag/{{$t}}.html">{{$t}}</a>
-                                                    {{end}}
-                                                </span>
-                                            </section>
-                                    </article>
-                                    {{end}}  
-                            </div>
-                        </main>
-                        <footer class="blog-footer">
-                                <p class="line-1">Powered by <a href=".https://golang.google.cn" target="_blank">Go</a> | Theme <a href=".https://github.com/ddiu8081/ghost-theme-Moegi" target="_blank">Moegi</a></p>
-                                <p class="line-2">&copy;<a href="./">My blog posts</a></p>
-                                <p id="footer-text" class="line-2"></p>
-                        </footer>        
-        
+                <main role="main">
+                    <div id="archives-list" class="index-search-list typo"></div>
+            
+                    <div id="articles">
+                            {{range $tkey, $post := .}}
+                            <article class="index-post">
+                                    <header class="post-toptitle">
+                                        <h2><a href="./{{$post.Meta.Slug}}.html">{{$post.Meta.Title}}</a></h2>
+                                    </header>
+                                    <section class="post-excerpt">
+                                        <p>{{$post.Excerpt}} ...</p>
+                                    </section>
+                                    <section class="post-meta">
+                                        <time datetime=" {{$post.Meta.Date}} ">{{$post.Meta.Date}}</time>
+                                        <span class="tags">
+                                            {{range $k, $t := $post.Meta.Tags}}
+                                            <a href="./tag/{{$t}}.html">{{$t}}</a>
+                                            {{end}}
+                                        </span>
+                                    </section>
+                            </article>
+                            {{end}}  
+                    </div>
+                </main>
             </div>
-        
-            <button id="go-to-top" class="go-to-top"></button>
-        
-            <script type="text/javascript" src="./static/js/nprogress.js"></script>
-            <script type="text/javascript" src="./static/js/moegi.loadconfig.js"></script>
-            <script type="text/javascript" src="./static/js/moegi.js"></script>
-            <script src="//lib.baomitu.com/moment.js/2.22.2/moment.min.js"></script>
-            <script src="//lib.baomitu.com/highlight.js/9.12.0/highlight.min.js"></script>
-            <script>hljs.initHighlightingOnLoad();</script>
+        {{template "_footer.html" .}}
     </body>
 
 </html>
