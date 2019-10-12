@@ -15,5 +15,6 @@
 .idea
 .vscode
 .DS_Store
+public
 
 go-static-blog
