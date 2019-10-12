@@ -10,12 +10,12 @@
             </header>
             <main role="main">
                 <header class="post-header">
-                    <h1 class="post-title">#{{.Name}}</h1>
+                    <h1 class="post-title">#{{.Tag.Name}}</h1>
                     <section class="post-meta">
-                            标签下共有{{len .Posts}}篇文章
+                            标签下共有{{len .Tag.Posts}}篇文章
                     </section>
                 </header>
-                {{range $tag, $post := .Posts}}
+                {{range $tag, $post := .Tag.Posts}} 
                 <article class="index-post">
                         <header class="post-toptitle">
                             <h2><a href="../{{$post.Meta.Slug}}.html">{{$post.Meta.Title}}</a></h2>

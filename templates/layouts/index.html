@@ -20,7 +20,7 @@
                     <div id="archives-list" class="index-search-list typo"></div>
             
                     <div id="articles">
-                            {{range $tkey, $post := .}}
+                            {{range $tkey, $post := .Post}}
                             <article class="index-post">
                                     <header class="post-toptitle">
                                         <h2><a href="./{{$post.Meta.Slug}}.html">{{$post.Meta.Title}}</a></h2>

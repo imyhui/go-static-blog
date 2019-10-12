@@ -7,7 +7,6 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
-	"regexp"
 	"sort"
 	"strings"
 	"text/template"
@@ -37,6 +36,9 @@ type Tag struct {
 	Name  string
 	Posts []Post
 }
+
+// Table is template Data
+type Table map[string]interface{}
 
 // ByDate use for post sort
 type ByDate []Post
@@ -99,19 +101,19 @@ func createPath(path string) error {
 }
 
 func writePost(post Post) {
-	t, err := template.ParseFiles("templates/post.html", "templates/partials/_header.html", "templates/partials/_footer.html")
-	if err != nil {
-		fmt.Printf("error %s", err)
-	}
 	fileName := fmt.Sprintf("public/%s.html", post.Meta.Slug)
-	file, err := os.OpenFile(fileName, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0755)
+	err := renderTemplate(fileName, "post.html", Table{"Post": post})
 	if err != nil {
 		fmt.Printf("error %s", err)
 	}
-	t.Execute(file, post)
 }
 
 func writePosts() []Post {
+	err := createPath("public")
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	posts := []Post{}
 	files := getSources()
 	for _, file := range files {
@@ -125,32 +127,23 @@ func writePosts() []Post {
 func writeTagPage(tags map[string][]Post) {
 	err := createPath("public/tag")
 	if err != nil {
-		fmt.Printf("error %s", err)
+		log.Fatal(err)
 	}
-	t, err := template.ParseFiles("templates/tag.html", "templates/partials/_header.html", "templates/partials/_footer.html")
+
 	for tag, post := range tags {
-		if err != nil {
-			fmt.Printf("error %s", err)
-		}
 		fileName := fmt.Sprintf("public/tag/%s.html", tag)
-		file, err := os.OpenFile(fileName, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0755)
+		err := renderTemplate(fileName, "tag.html", Table{"Tag": Tag{tag, post}})
 		if err != nil {
 			fmt.Printf("error %s", err)
 		}
-		t.Execute(file, Tag{tag, post})
 	}
 }
 
 func writeTagsIndex(tags map[string][]Post) {
-	t, err := template.ParseFiles("templates/tags.html", "templates/partials/_header.html", "templates/partials/_footer.html")
+	err := renderTemplate("public/tags.html", "tags.html", Table{"Tags": tags})
 	if err != nil {
 		fmt.Printf("error %s", err)
 	}
-	file, err := os.OpenFile("public/tags.html", os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0755)
-	if err != nil {
-		fmt.Printf("error %s", err)
-	}
-	t.Execute(file, tags)
 }
 
 func writeTags(posts []Post) {
@@ -167,37 +160,48 @@ func writeTags(posts []Post) {
 
 func writeIndex(posts []Post) {
 	sort.Sort(ByDate(posts))
-	t, err := template.ParseFiles("templates/index.html", "templates/partials/_header.html", "templates/partials/_footer.html")
+	err := renderTemplate("public/index.html", "index.html", Table{"Post": posts})
 	if err != nil {
 		fmt.Printf("error %s", err)
 	}
-	file, err := os.OpenFile("public/index.html", os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0755)
-	if err != nil {
-		fmt.Printf("error %s", err)
-	}
-	t.Execute(file, posts)
 }
 
-func handler(w http.ResponseWriter, r *http.Request) {
-	var validPath = regexp.MustCompile("^/((tag/)?[\u4e00-\u9fa5a-z0-9-]+)$")
-	postURL := validPath.FindStringSubmatch(r.URL.Path)
-	filePath := "public/index.html"
+var templates map[string]*template.Template
 
-	if postURL != nil {
-		filePath = fmt.Sprintf("public/%s.html", postURL[1])
+func init() {
+	if templates == nil {
+		templates = make(map[string]*template.Template)
 	}
-	log.Println(filePath)
-	t, _ := template.ParseFiles(filePath)
-	err := t.Execute(w, nil)
+	templatesDir := "./templates/"
+	layouts, err := filepath.Glob(templatesDir + "layouts/*.html")
 	if err != nil {
-		fmt.Printf("error %s", err)
+		log.Fatal(err)
 	}
+	partials, err := filepath.Glob(templatesDir + "partials/*.html")
+	if err != nil {
+		log.Fatal(err)
+	}
+	for _, layout := range layouts {
+		files := append(partials, layout)
+		templates[filepath.Base(layout)] = template.Must(template.ParseFiles(files...))
+	}
+}
+func renderTemplate(filePath string, tempName string, data interface{}) error {
+	tmpl, ok := templates[tempName]
+	if !ok {
+		return fmt.Errorf("The template %s does not exist", tempName)
+	}
+	file, err := os.OpenFile(filePath, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0755)
+	if err != nil {
+		return fmt.Errorf("%s create fail", filePath)
+	}
+	return tmpl.ExecuteTemplate(file, tempName, data)
 }
 
 func main() {
 	posts := writePosts()
 	writeIndex(posts)
 	writeTags(posts)
-	http.HandleFunc("/", handler)
+	http.Handle("/", http.FileServer(http.Dir("public")))
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }

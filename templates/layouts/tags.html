@@ -13,14 +13,14 @@
                     <header class="post-header short-diver">
                         <h1 class="post-title">标签</h1>
                         <section class="post-meta">
-                            共有{{len .}}个标签
+                            共有{{len .Tags}}个标签
                         </section>
                     </header>
 
                     <div class="left">
                             <div class="tag-cloud tags">
-                                    {{range $tag, $post := .}}
-                                    <a href="./tag/{{$tag}}.html" class="tag-item">#{{$tag}} ({{len $post}})</a>
+                                    {{range $tag, $post := .Tags}}
+                                    <a href="./tag/{{$tag}}.html" class="tag-item">{{$tag}} ({{len $post}})</a>
                                     {{end}}
                             </div>
                     </div>
