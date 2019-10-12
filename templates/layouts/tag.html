@@ -5,7 +5,7 @@
         <div class="container">
             <header>
                     <div class="post-blog-title">
-                        <a href="../index.html"><i class="iconfont icon-back"></i>&nbsp;My blog posts</a>
+                        <a href="{{.Prefix}}/index.html"><i class="iconfont icon-back"></i>&nbsp;My blog posts</a>
                     </div>
             </header>
             <main role="main">
@@ -15,10 +15,11 @@
                             标签下共有{{len .Tag.Posts}}篇文章
                     </section>
                 </header>
+                {{$prefix := .Prefix}}
                 {{range $tag, $post := .Tag.Posts}} 
                 <article class="index-post">
                         <header class="post-toptitle">
-                            <h2><a href="../{{$post.Meta.Slug}}.html">{{$post.Meta.Title}}</a></h2>
+                            <h2><a href="{{$prefix}}/{{$post.Meta.Slug}}.html">{{$post.Meta.Title}}</a></h2>
                         </header>
                         <section class="post-excerpt">
                             <p>{{$post.Excerpt}} ...</p>

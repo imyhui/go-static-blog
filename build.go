@@ -47,6 +47,15 @@ func (a ByDate) Len() int           { return len(a) }
 func (a ByDate) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 func (a ByDate) Less(i, j int) bool { return a[i].Meta.Date > a[j].Meta.Date }
 
+const (
+	// SEP split post Meta and Content
+	SEP = "---"
+	// CURDIR is Current directory
+	CURDIR = "."
+	// UPDIR is Upper level directory
+	UPDIR = ".."
+)
+
 func getSources() []string {
 	files, _ := filepath.Glob("srcs/*.md")
 	return files
@@ -62,7 +71,6 @@ func parseSource(fileName string) Post {
 	sources, _ := ioutil.ReadFile(fileName)
 	lines := strings.Split(string(sources), "\n")
 	metaLoc := [2]int{}
-	SEP := "---"
 	if lines[0] == SEP {
 		metaLoc[0] = 1
 	}
@@ -102,7 +110,7 @@ func createPath(path string) error {
 
 func writePost(post Post) {
 	fileName := fmt.Sprintf("public/%s.html", post.Meta.Slug)
-	err := renderTemplate(fileName, "post.html", Table{"Post": post})
+	err := renderTemplate(fileName, "post.html", Table{"Post": post, "Prefix": CURDIR})
 	if err != nil {
 		fmt.Printf("error %s", err)
 	}
@@ -132,7 +140,7 @@ func writeTagPage(tags map[string][]Post) {
 
 	for tag, post := range tags {
 		fileName := fmt.Sprintf("public/tag/%s.html", tag)
-		err := renderTemplate(fileName, "tag.html", Table{"Tag": Tag{tag, post}})
+		err := renderTemplate(fileName, "tag.html", Table{"Tag": Tag{tag, post}, "Prefix": UPDIR})
 		if err != nil {
 			fmt.Printf("error %s", err)
 		}
@@ -140,7 +148,7 @@ func writeTagPage(tags map[string][]Post) {
 }
 
 func writeTagsIndex(tags map[string][]Post) {
-	err := renderTemplate("public/tags.html", "tags.html", Table{"Tags": tags})
+	err := renderTemplate("public/tags.html", "tags.html", Table{"Tags": tags, "Prefix": CURDIR})
 	if err != nil {
 		fmt.Printf("error %s", err)
 	}
@@ -160,7 +168,7 @@ func writeTags(posts []Post) {
 
 func writeIndex(posts []Post) {
 	sort.Sort(ByDate(posts))
-	err := renderTemplate("public/index.html", "index.html", Table{"Post": posts})
+	err := renderTemplate("public/index.html", "index.html", Table{"Post": posts, "Prefix": CURDIR})
 	if err != nil {
 		fmt.Printf("error %s", err)
 	}

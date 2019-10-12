@@ -2,12 +2,12 @@
 <html>
     {{template "_header.html" .}}
     <header class="center">
-        <div class="blog-title"><a href="./index.html">My blog posts</a></div>
+        <div class="blog-title"><a href="{{.Prefix}}/index.html">My blog posts</a></div>
         <div class="blog-description">Thoughts, stories and ideas.</div>
         <div class="top-nav">
                 <ul id="navigation">
-                    <li class="nav" role="presentation"><a href="./index.html">Home</a></li>
-                    <li class="nav" role="presentation"><a href="./tags.html">Tags</a></li>
+                    <li class="nav" role="presentation"><a href="{{.Prefix}}/index.html">Home</a></li>
+                    <li class="nav" role="presentation"><a href="{{.Prefix}}/tags.html">Tags</a></li>
                     <!-- <li class="nav" role="presentation"><a href="./archives">Archives</a></li> -->
                     <!-- <li class="nav" role="presentation"><a href="./about">About</a></li> -->
                     <li class="nav" role="presentation"><a href="https://github.com/imyhui">Github</a></li>
@@ -20,10 +20,11 @@
                     <div id="archives-list" class="index-search-list typo"></div>
             
                     <div id="articles">
+                            {{$prefix := .Prefix}}
                             {{range $tkey, $post := .Post}}
                             <article class="index-post">
                                     <header class="post-toptitle">
-                                        <h2><a href="./{{$post.Meta.Slug}}.html">{{$post.Meta.Title}}</a></h2>
+                                        <h2><a href="{{$prefix}}/{{$post.Meta.Slug}}.html">{{$post.Meta.Title}}</a></h2>
                                     </header>
                                     <section class="post-excerpt">
                                         <p>{{$post.Excerpt}} ...</p>
@@ -32,7 +33,7 @@
                                         <time datetime=" {{$post.Meta.Date}} ">{{$post.Meta.Date}}</time>
                                         <span class="tags">
                                             {{range $k, $t := $post.Meta.Tags}}
-                                            <a href="./tag/{{$t}}.html">{{$t}}</a>
+                                            <a href="{{$prefix}}/tag/{{$t}}.html">{{$t}}</a>
                                             {{end}}
                                         </span>
                                     </section>
