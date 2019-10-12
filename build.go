@@ -54,6 +54,10 @@ const (
 	CURDIR = "."
 	// UPDIR is Upper level directory
 	UPDIR = ".."
+	// TPLDIR is template directory
+	TPLDIR = "./templates/"
+	// PUBDIR is public directory
+	PUBDIR = "public"
 )
 
 func getSources() []string {
@@ -109,7 +113,7 @@ func createPath(path string) error {
 }
 
 func writePost(post Post) {
-	fileName := fmt.Sprintf("public/%s.html", post.Meta.Slug)
+	fileName := fmt.Sprintf(PUBDIR+"/%s.html", post.Meta.Slug)
 	err := renderTemplate(fileName, "post.html", Table{"Post": post, "Prefix": CURDIR})
 	if err != nil {
 		fmt.Printf("error %s", err)
@@ -117,7 +121,7 @@ func writePost(post Post) {
 }
 
 func writePosts() []Post {
-	err := createPath("public")
+	err := createPath(PUBDIR)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -133,13 +137,13 @@ func writePosts() []Post {
 }
 
 func writeTagPage(tags map[string][]Post) {
-	err := createPath("public/tag")
+	err := createPath(PUBDIR + "/tag")
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	for tag, post := range tags {
-		fileName := fmt.Sprintf("public/tag/%s.html", tag)
+		fileName := fmt.Sprintf(PUBDIR+"/tag/%s.html", tag)
 		err := renderTemplate(fileName, "tag.html", Table{"Tag": Tag{tag, post}, "Prefix": UPDIR})
 		if err != nil {
 			fmt.Printf("error %s", err)
@@ -148,7 +152,7 @@ func writeTagPage(tags map[string][]Post) {
 }
 
 func writeTagsIndex(tags map[string][]Post) {
-	err := renderTemplate("public/tags.html", "tags.html", Table{"Tags": tags, "Prefix": CURDIR})
+	err := renderTemplate(PUBDIR+"/tags.html", "tags.html", Table{"Tags": tags, "Prefix": CURDIR})
 	if err != nil {
 		fmt.Printf("error %s", err)
 	}
@@ -168,7 +172,7 @@ func writeTags(posts []Post) {
 
 func writeIndex(posts []Post) {
 	sort.Sort(ByDate(posts))
-	err := renderTemplate("public/index.html", "index.html", Table{"Post": posts, "Prefix": CURDIR})
+	err := renderTemplate(PUBDIR+"/index.html", "index.html", Table{"Post": posts, "Prefix": CURDIR})
 	if err != nil {
 		fmt.Printf("error %s", err)
 	}
@@ -180,12 +184,12 @@ func init() {
 	if templates == nil {
 		templates = make(map[string]*template.Template)
 	}
-	templatesDir := "./templates/"
-	layouts, err := filepath.Glob(templatesDir + "layouts/*.html")
+
+	layouts, err := filepath.Glob(TPLDIR + "layouts/*.html")
 	if err != nil {
 		log.Fatal(err)
 	}
-	partials, err := filepath.Glob(templatesDir + "partials/*.html")
+	partials, err := filepath.Glob(TPLDIR + "partials/*.html")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -210,6 +214,6 @@ func main() {
 	posts := writePosts()
 	writeIndex(posts)
 	writeTags(posts)
-	http.Handle("/", http.FileServer(http.Dir("public")))
+	http.Handle("/", http.FileServer(http.Dir(PUBDIR)))
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
