@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -105,14 +106,6 @@ func parseSource(fileName string) Post {
 	return post
 }
 
-func createPath(path string) error {
-	_, err := os.Stat(path)
-	if err != nil && os.IsNotExist(err) {
-		return os.Mkdir(path, os.ModePerm)
-	}
-	return nil
-}
-
 func writePost(post Post) {
 	fileName := fmt.Sprintf(PUBDIR+"/%s.html", post.Meta.Slug)
 	err := renderTemplate(fileName, "post.html", Table{"Post": post, "Prefix": CURDIR})
@@ -122,21 +115,6 @@ func writePost(post Post) {
 }
 
 func writePosts() []Post {
-	err := cleanDir(PUBDIR)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	err = createPath(PUBDIR)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	err = copyDir(TPLDIR+"static", PUBDIR)
-	if err != nil {
-		log.Fatal(err)
-	}
-
 	posts := []Post{}
 	files := getSources()
 	for _, file := range files {
@@ -148,11 +126,6 @@ func writePosts() []Post {
 }
 
 func writeTagPage(tags map[string][]Post) {
-	err := createPath(PUBDIR + "/tag")
-	if err != nil {
-		log.Fatal(err)
-	}
-
 	for tag, post := range tags {
 		fileName := fmt.Sprintf(PUBDIR+"/tag/%s.html", tag)
 		err := renderTemplate(fileName, "tag.html", Table{"Tag": Tag{tag, post}, "Prefix": UPDIR})
@@ -191,7 +164,7 @@ func writeIndex(posts []Post) {
 
 var templates map[string]*template.Template
 
-func init() {
+func parseTemplates() {
 	if templates == nil {
 		templates = make(map[string]*template.Template)
 	}
@@ -209,6 +182,7 @@ func init() {
 		templates[filepath.Base(layout)] = template.Must(template.ParseFiles(files...))
 	}
 }
+
 func renderTemplate(filePath string, tempName string, data interface{}) error {
 	tmpl, ok := templates[tempName]
 	if !ok {
@@ -226,6 +200,14 @@ func cleanDir(dst string) error {
 	return err
 }
 
+func createDir(path string) error {
+	_, err := os.Stat(path)
+	if err != nil && os.IsNotExist(err) {
+		return os.Mkdir(path, os.ModePerm)
+	}
+	return nil
+}
+
 func copyDir(src string, dst string) error {
 	info, err := os.Stat(src)
 	if err != nil || !info.IsDir() {
@@ -236,10 +218,64 @@ func copyDir(src string, dst string) error {
 	return err
 }
 
-func main() {
+func createPaths() {
+	err := cleanDir(PUBDIR)
+	if err != nil {
+		log.Fatal(err)
+	}
+	err = createDir(PUBDIR)
+	if err != nil {
+		log.Fatal(err)
+	}
+	err = copyDir(TPLDIR+"static", PUBDIR)
+	if err != nil {
+		log.Fatal(err)
+	}
+	err = createDir(PUBDIR + "/tag")
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+func generate() {
+	parseTemplates()
+	createPaths()
 	posts := writePosts()
 	writeIndex(posts)
 	writeTags(posts)
+}
+
+func server() {
 	http.Handle("/", http.FileServer(http.Dir(PUBDIR)))
 	log.Fatal(http.ListenAndServe(":8080", nil))
+}
+
+var (
+	serve bool
+	gene  bool
+)
+
+func init() {
+	flag.BoolVar(&serve, "s", false, "server on 8080")
+	flag.BoolVar(&gene, "g", false, "clean and generate")
+	flag.Usage = usage
+	flag.Parse()
+}
+
+func usage() {
+	fmt.Fprintf(os.Stderr, `go-static-blog version: 1.0.0
+Usage: go-static-blog [-g generate] [-s server] 
+
+Options:
+`)
+	flag.PrintDefaults()
+}
+
+func main() {
+	if gene {
+		generate()
+	}
+	if serve {
+		server()
+	}
 }
