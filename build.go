@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"sort"
 	"strings"
@@ -121,7 +122,17 @@ func writePost(post Post) {
 }
 
 func writePosts() []Post {
-	err := createPath(PUBDIR)
+	err := cleanDir(PUBDIR)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	err = createPath(PUBDIR)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	err = copyDir(TPLDIR+"static", PUBDIR)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -208,6 +219,21 @@ func renderTemplate(filePath string, tempName string, data interface{}) error {
 		return fmt.Errorf("%s create fail", filePath)
 	}
 	return tmpl.ExecuteTemplate(file, tempName, data)
+}
+func cleanDir(dst string) error {
+	cmd := exec.Command("rm", "-rf", dst)
+	err := cmd.Run()
+	return err
+}
+
+func copyDir(src string, dst string) error {
+	info, err := os.Stat(src)
+	if err != nil || !info.IsDir() {
+		return err
+	}
+	cmd := exec.Command("cp", "-rf", src, dst)
+	err = cmd.Run()
+	return err
 }
 
 func main() {
