@@ -1,8 +1,31 @@
 # go-static-blog
 Go 语言实现的静态博客生成器
 
+## 使用
 
+```shell
+$ git clone https://github.com/imyhui/go-static-blog
+$ cd go-static-blog
+$ go build
+```
 
+```shell
+$ ./go-static-blog -h
+go-static-blog version: 1.0.0
+Usage: go-static-blog [-g generate] [-s server] 
+
+Options:
+  -g	clean and generate
+  -s	server on 8080
+```
+
+```golang
+$ ./go-static-blog -g -s
+```
+
+访问 [http://localhost:8080](http://localhost:8080/)
+
+## 界面
 主页
 ![](http://ghost.andyhui.top/主页.png)
 文章页面
